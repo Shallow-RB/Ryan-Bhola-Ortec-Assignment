@@ -9,11 +9,19 @@ interface PersonFormValues {
 export function InfoList() {
   const [peopleList, setPeopleList] = useState([]);
 
+  // UseEffect to fetch LocalStorage items on load.
   useEffect(() => {
-    const people = JSON.parse(window.localStorage.getItem("people") || "[]");
-    if (people) {
+    function load() {
+      const people = JSON.parse(window.localStorage.getItem("people") || "[]");
       setPeopleList(people);
     }
+    load();
+    window.addEventListener("people:update", load);
+    window.addEventListener("storage", load);
+    return () => {
+      window.removeEventListener("people:update", load);
+      window.removeEventListener("storage", load);
+    };
   }, []);
 
   return (

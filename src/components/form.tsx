@@ -34,6 +34,8 @@ export function Form() {
         "people",
         JSON.stringify([next, ...existing])
       );
+      // Notify listeners that people changed
+      window.dispatchEvent(new Event("people:update"));
       reset();
     } catch {}
   }
