@@ -70,7 +70,7 @@ export function Form() {
             const s = String(v);
             const isNational = /^0\d{9}$/.test(s);
             const isIntl = /^31\d{9}$/.test(s);
-            return isNational || isIntl || "Enter a valid number";
+            return isNational || isIntl || "Enter a valid phone number";
           },
         })}
       />
