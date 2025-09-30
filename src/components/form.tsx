@@ -5,7 +5,10 @@ import { useForm } from "react-hook-form";
 interface PersonFormValues {
   firstName: string;
   phoneNumber: string;
+  joke: string;
 }
+
+const API_URL: string = "https://api.chucknorris.io/jokes/random";
 
 export function Form() {
   const {
@@ -15,12 +18,15 @@ export function Form() {
     reset,
   } = useForm<PersonFormValues>({
     mode: "onChange",
-    defaultValues: { firstName: "", phoneNumber: "" },
+    defaultValues: { firstName: "", phoneNumber: "", joke: "" },
   });
 
-  function onSubmit(data: PersonFormValues) {
+  async function onSubmit(data: PersonFormValues) {
     if (typeof window === "undefined") return;
     try {
+      const res = await fetch(API_URL);
+      const jokeJson = await res.json();
+      const joke = jokeJson.value;
       // Get existing data from localStorage
       const existing = JSON.parse(
         window.localStorage.getItem("people") || "[]"
@@ -28,6 +34,7 @@ export function Form() {
       // Add new data to existing data
       const next = {
         ...data,
+        joke,
       };
       // Set new data to localStorage
       window.localStorage.setItem(
@@ -68,6 +75,7 @@ export function Form() {
         {...register("phoneNumber", {
           required: "Phone number is required",
           setValueAs: (v) => String(v ?? "").replace(/\D/g, ""),
+          //Validate phone number
           validate: (v) => {
             const s = String(v);
             const isNational = /^0\d{9}$/.test(s);

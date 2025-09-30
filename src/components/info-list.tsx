@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 interface PersonFormValues {
   firstName: string;
   phoneNumber: string;
+  joke: string;
 }
 
 export function InfoList() {
@@ -31,9 +32,12 @@ export function InfoList() {
           key={`${person.firstName}-${person.phoneNumber}-${index}`}
           className="flex items-center justify-between rounded-md border border-gray-200 px-3 py-2 text-sm"
         >
-          <span>
-            {person.firstName} - {person.phoneNumber}
-          </span>
+          <div className="flex flex-col">
+            <span>
+              {person.firstName} - {person.phoneNumber}
+            </span>
+            <span className="text-xs text-gray-600 mt-1">{person.joke}</span>
+          </div>
           <button
             type="button"
             onClick={() => {
