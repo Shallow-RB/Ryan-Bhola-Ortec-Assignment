@@ -65,12 +65,13 @@ export function Form() {
         // Register phone number input
         {...register("phoneNumber", {
           required: "Phone number is required",
-          setValueAs: (v) =>
-            String(v ?? "")
-              .replace(/\D/g, "")
-              .slice(0, 10),
-          validate: (v) =>
-            /^\d{10}$/.test(v) || "Phone number must be 10 digits",
+          setValueAs: (v) => String(v ?? "").replace(/\D/g, ""),
+          validate: (v) => {
+            const s = String(v);
+            const isNational = /^0\d{9}$/.test(s);
+            const isIntl = /^31\d{9}$/.test(s);
+            return isNational || isIntl || "Enter a valid number";
+          },
         })}
       />
       {/* Error message */}
