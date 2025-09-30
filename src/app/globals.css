@@ -1,8 +1,18 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0b1020; /* canvas tint for subtle contrast in sections */
+  --panel: #ffffff; /* card and input background */
+  --muted: #f5f7fb; /* soft surfaces */
+  --border: #e5e7eb; /* light borders */
+  --ring: #c7d2fe; /* focus ring tint */
+  --foreground: #0f172a; /* text body */
+  --foreground-muted: #475569; /* secondary text */
+
+  --primary: #2563eb; /* blue-600 */
+  --primary-hover: #1d4ed8; /* blue-700 */
+  --destructive: #ef4444; /* red-500 */
+  --destructive-ring: #fecaca; /* red-200 */
 }
 
 @theme inline {
@@ -13,7 +23,26 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--muted);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar theming (WebKit) */
+*::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #d1d5db;
 }

@@ -8,7 +8,7 @@ interface PersonFormValues {
   joke: string;
 }
 
-const API_URL: string = "https://api.chucknorris.io/jokes/random";
+const API_URL = "https://api.chucknorris.io/jokes/random";
 
 export function Form() {
   const {
@@ -54,7 +54,7 @@ export function Form() {
     >
       <input
         placeholder="First Name"
-        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+        className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors motion-reduce:transition-none"
         // Register first name input
         {...register("firstName", {
           required: "First name is required",
@@ -70,7 +70,7 @@ export function Form() {
       <input
         inputMode="numeric"
         placeholder="1234567890"
-        className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm focus:border-gray-400 focus:ring-2 focus:ring-gray-200"
+        className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors motion-reduce:transition-none"
         // Register phone number input
         {...register("phoneNumber", {
           required: "Phone number is required",
@@ -92,7 +92,7 @@ export function Form() {
       <button
         type="submit"
         disabled={!isValid}
-        className="inline-flex w-full cursor-pointer items-center justify-center rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-300"
+        className="inline-flex w-full cursor-pointer items-center justify-center rounded-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 px-4 py-2 text-sm font-medium text-white transition-colors motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-300"
       >
         Save
       </button>
