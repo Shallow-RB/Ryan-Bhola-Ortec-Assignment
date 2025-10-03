@@ -3,99 +3,142 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
+import { User, Phone, Loader2, Save, Smile } from "lucide-react";
 import { personSchema, type PersonFormValues } from "@/schemas/person";
+import {
+  Form as FormProvider,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const API_URL = "https://api.chucknorris.io/jokes/random";
 
 export function Form() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isValid },
-    reset,
-  } = useForm<PersonFormValues>({
+  const form = useForm<PersonFormValues>({
     resolver: zodResolver(personSchema),
-    mode: "onChange",
+    mode: "onBlur",
     defaultValues: { firstName: "", phoneNumber: "", joke: "" },
   });
+
+  const {
+    formState: { isSubmitting, isValid },
+  } = form;
 
   async function onSubmit(data: PersonFormValues) {
     if (typeof window === "undefined") return;
 
     try {
-      // Show loading toast
-      const loadingToast = toast.loading("Fetching a joke...");
-
       const res = await fetch(API_URL);
       const jokeJson = await res.json();
       const joke = jokeJson.value;
 
-      // Get existing data from localStorage
       const existing = JSON.parse(
         window.localStorage.getItem("people") || "[]"
       );
 
-      // Add new data to existing data
-      const next = {
-        ...data,
-        joke,
-      };
+      const next = { ...data, joke };
 
-      // Set new data to localStorage
       window.localStorage.setItem(
         "people",
         JSON.stringify([next, ...existing])
       );
-
-      // Notify listeners that people changed
       window.dispatchEvent(new Event("people:update"));
 
-      // Dismiss loading toast and show success
-      toast.dismiss(loadingToast);
-      toast.success(`${data.firstName} has been added successfully!`);
+      toast.success(`${data.firstName} added`, {
+        description: "Saved with a random joke",
+      });
 
-      reset();
+      form.reset();
     } catch (error) {
-      toast.error("Failed to fetch joke. Please try again.");
+      toast.error("Failed to fetch joke", {
+        description: "Please try again",
+      });
       console.error("Error:", error);
     }
   }
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="w-full max-w-md space-y-3"
-    >
-      <input
-        placeholder="First Name"
-        className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors motion-reduce:transition-none"
-        // Register first name input
-        {...register("firstName")}
-      />
-      {/* Error message */}
-      {errors.firstName?.message && (
-        <p className="text-xs text-red-600">{errors.firstName.message}</p>
-      )}
+    <FormProvider {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-2 text-sm">
+                <User className="h-4 w-4 text-blue-600" />
+                First name
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input {...field} placeholder="Chuck Norris" />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <input
-        inputMode="numeric"
-        placeholder="1234567890"
-        className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors motion-reduce:transition-none"
-        // Register phone number input
-        {...register("phoneNumber")}
-      />
-      {/* Error message */}
-      {errors.phoneNumber?.message && (
-        <p className="text-xs text-red-600">{errors.phoneNumber.message}</p>
-      )}
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel className="flex items-center gap-2 text-sm">
+                <Phone className="h-4 w-4 text-orange-600" />
+                Phone
+              </FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Input
+                    {...field}
+                    type="tel"
+                    inputMode="numeric"
+                    placeholder="06 - 12345678"
+                    onChange={(e) => {
+                      // Allow only digits, spaces, dashes, and parentheses
+                      const value = e.target.value.replace(
+                        /[^\d\s\-\(\)]/g,
+                        ""
+                      );
+                      field.onChange(value);
+                    }}
+                  />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-      <button
-        type="submit"
-        disabled={!isValid}
-        className="inline-flex w-full cursor-pointer items-center justify-center rounded-md bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-200 px-4 py-2 text-sm font-medium text-white transition-colors motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-gray-300"
-      >
-        Save
-      </button>
-    </form>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Smile className="h-3.5 w-3.5 text-orange-500" />A random joke will be
+          fetched automatically.
+        </div>
+
+        <Button
+          type="submit"
+          disabled={!isValid || isSubmitting}
+          className="w-full cursor-pointer"
+        >
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4" />
+              Save
+            </>
+          )}
+        </Button>
+      </form>
+    </FormProvider>
   );
 }
