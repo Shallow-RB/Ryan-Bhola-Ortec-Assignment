@@ -1,12 +1,9 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-
-interface PersonFormValues {
-  firstName: string;
-  phoneNumber: string;
-  joke: string;
-}
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { personSchema, type PersonFormValues } from "@/schemas/person";
 
 const API_URL = "https://api.chucknorris.io/jokes/random";
 
@@ -17,34 +14,51 @@ export function Form() {
     formState: { errors, isValid },
     reset,
   } = useForm<PersonFormValues>({
+    resolver: zodResolver(personSchema),
     mode: "onChange",
     defaultValues: { firstName: "", phoneNumber: "", joke: "" },
   });
 
   async function onSubmit(data: PersonFormValues) {
     if (typeof window === "undefined") return;
+
     try {
+      // Show loading toast
+      const loadingToast = toast.loading("Fetching a joke...");
+
       const res = await fetch(API_URL);
       const jokeJson = await res.json();
       const joke = jokeJson.value;
+
       // Get existing data from localStorage
       const existing = JSON.parse(
         window.localStorage.getItem("people") || "[]"
       );
+
       // Add new data to existing data
       const next = {
         ...data,
         joke,
       };
+
       // Set new data to localStorage
       window.localStorage.setItem(
         "people",
         JSON.stringify([next, ...existing])
       );
+
       // Notify listeners that people changed
       window.dispatchEvent(new Event("people:update"));
+
+      // Dismiss loading toast and show success
+      toast.dismiss(loadingToast);
+      toast.success(`${data.firstName} has been added successfully!`);
+
       reset();
-    } catch {}
+    } catch (error) {
+      toast.error("Failed to fetch joke. Please try again.");
+      console.error("Error:", error);
+    }
   }
 
   return (
@@ -56,11 +70,7 @@ export function Form() {
         placeholder="First Name"
         className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors motion-reduce:transition-none"
         // Register first name input
-        {...register("firstName", {
-          required: "First name is required",
-          validate: (v) =>
-            v.trim().length >= 2 || "First name must be at least 2 characters",
-        })}
+        {...register("firstName")}
       />
       {/* Error message */}
       {errors.firstName?.message && (
@@ -72,17 +82,7 @@ export function Form() {
         placeholder="1234567890"
         className="w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-colors motion-reduce:transition-none"
         // Register phone number input
-        {...register("phoneNumber", {
-          required: "Phone number is required",
-          setValueAs: (v) => String(v ?? "").replace(/\D/g, ""),
-          //Validate phone number
-          validate: (v) => {
-            const s = String(v);
-            const isNational = /^0\d{9}$/.test(s);
-            const isIntl = /^31\d{9}$/.test(s);
-            return isNational || isIntl || "Enter a valid phone number";
-          },
-        })}
+        {...register("phoneNumber")}
       />
       {/* Error message */}
       {errors.phoneNumber?.message && (

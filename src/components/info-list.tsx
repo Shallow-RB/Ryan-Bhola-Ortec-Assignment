@@ -1,15 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { isFibonacci } from "@/lib/utils";
-
-interface PersonFormValues {
-  firstName: string;
-  phoneNumber: string;
-  joke: string;
-}
+import { type PersonFormValues } from "@/schemas/person";
 
 export function InfoList() {
-  const [peopleList, setPeopleList] = useState([]);
+  const [peopleList, setPeopleList] = useState<PersonFormValues[]>([]);
 
   // UseEffect to fetch LocalStorage items on load.
   useEffect(() => {
@@ -52,10 +48,11 @@ export function InfoList() {
               type="button"
               onClick={() => {
                 const next = [...peopleList];
-                next.splice(index, 1);
+                const deletedPerson = next.splice(index, 1)[0];
                 window.localStorage.setItem("people", JSON.stringify(next));
                 setPeopleList(next);
                 window.dispatchEvent(new Event("people:update"));
+                toast.success(`${deletedPerson.firstName} has been deleted`);
               }}
               className="rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-200 cursor-pointer"
             >
