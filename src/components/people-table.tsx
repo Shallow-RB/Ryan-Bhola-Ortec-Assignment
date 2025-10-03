@@ -9,14 +9,25 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { toast } from "sonner";
 import {
-  Filter,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Phone,
   Search,
   Sparkles,
   Trash2,
   User,
-  MessageSquare,
   Quote,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 
 interface Filters {
@@ -60,13 +71,12 @@ export function PeopleTable() {
     return byFib;
   }, [people, filters]);
 
-  function handleDelete(index: number) {
-    const next = [...people];
-    const removed = next.splice(index, 1)[0];
+  function handleDelete(personToDelete: PersonFormValues) {
+    const next = people.filter((p) => p !== personToDelete);
     window.localStorage.setItem("people", JSON.stringify(next));
     setPeople(next);
     window.dispatchEvent(new Event("people:update"));
-    toast.success(`${removed.firstName} removed`, {
+    toast.success(`${personToDelete.firstName} removed`, {
       description: "The person has been deleted",
     });
   }
@@ -86,21 +96,6 @@ export function PeopleTable() {
             className="w-full pl-9"
           />
         </div>
-        <Button
-          type="button"
-          variant={filters.showFibonacciOnly ? "default" : "outline"}
-          size="sm"
-          onClick={() =>
-            setFilters((f) => ({
-              ...f,
-              showFibonacciOnly: !f.showFibonacciOnly,
-            }))
-          }
-          className="flex-shrink-0"
-        >
-          <Filter className="mr-2 h-4 w-4" />
-          {filters.showFibonacciOnly ? "Showing Fibonacci" : "Fibonacci only"}
-        </Button>
       </div>
 
       {/* list items */}
@@ -141,21 +136,81 @@ export function PeopleTable() {
                         </div>
                       </div>
                     </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="icon-sm"
-                      aria-label={`Delete ${person.firstName}`}
-                      onClick={() => handleDelete(i)}
-                      className="h-8 w-8 flex-shrink-0"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon-sm"
+                          aria-label={`Delete ${person.firstName}`}
+                          className="h-8 w-8 flex-shrink-0 cursor-pointer"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent className="sm:max-w-md">
+                        <AlertDialogHeader className="text-center">
+                          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100">
+                            <AlertTriangle className="h-6 w-6 text-red-600" />
+                          </div>
+                          <AlertDialogTitle className="text-xl text-center font-semibold">
+                            Delete Person
+                          </AlertDialogTitle>
+                          <AlertDialogDescription className="text-base text-center">
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+
+                        {/* Person Info Card */}
+                        <div className="my-6 rounded-lg border border-gray-200 bg-gray-50 p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                              <User className="h-5 w-5 text-blue-600" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-medium text-gray-900 truncate">
+                                {person.firstName}
+                              </h3>
+                              <div className="flex items-center gap-2 text-sm text-gray-600">
+                                <Phone className="h-4 w-4 text-orange-600 flex-shrink-0" />
+                                <span className="font-mono">
+                                  {person.phoneNumber}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                          {person.joke && (
+                            <div className="mt-3 pt-3 border-t border-gray-200">
+                              <div className="flex items-start gap-2">
+                                <Quote className="mt-0.5 h-4 w-4 text-gray-400 flex-shrink-0" />
+                                <p className="text-sm text-gray-600 italic leading-relaxed line-clamp-2">
+                                  &ldquo;{person.joke}&rdquo;
+                                </p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+
+                        <AlertDialogFooter className="gap-3 sm:gap-2">
+                          <AlertDialogCancel className="flex items-center gap-2">
+                            <X className="h-4 w-4" />
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(person)}
+                            className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete Person
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </div>
                 </CardHeader>
                 {person.joke && (
                   <CardContent className="pt-0">
-                    <div className="flex items-start gap-2 rounded-lg bg-muted/30 p-3">
+                    <div className="flex items-start gap-2 rounded-lg bg-gray-100/50 p-3">
                       <Quote className="mt-0.5 h-4 w-4 text-muted-foreground flex-shrink-0" />
                       <p className="text-sm italic text-muted-foreground leading-relaxed break-words">
                         &ldquo;{person.joke}&rdquo;
