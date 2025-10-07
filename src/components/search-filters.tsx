@@ -17,9 +17,9 @@ export function SearchFilters({
           }
           placeholder="Search name, phone or joke..."
           className="w-full pl-9"
+          data-cy="search-input"
         />
       </div>
     </div>
   );
 }
-

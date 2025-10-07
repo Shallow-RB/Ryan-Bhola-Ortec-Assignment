@@ -28,7 +28,11 @@ export function FormFields({ form }: FormFieldsProps) {
             </FormLabel>
             <FormControl>
               <div className="relative">
-                <Input {...field} placeholder="Chuck Norris" />
+                <Input
+                  {...field}
+                  placeholder="Chuck Norris"
+                  data-cy="first-name-input"
+                />
               </div>
             </FormControl>
             <FormMessage />
@@ -52,6 +56,7 @@ export function FormFields({ form }: FormFieldsProps) {
                   type="tel"
                   inputMode="numeric"
                   placeholder="06 - 12345678"
+                  data-cy="phone-number-input"
                   onChange={(e) => {
                     // Allow only digits, spaces, dashes, and parentheses
                     const value = e.target.value.replace(/[^\d\s\-\(\)]/g, "");
@@ -72,4 +77,3 @@ export function FormFields({ form }: FormFieldsProps) {
     </>
   );
 }
-

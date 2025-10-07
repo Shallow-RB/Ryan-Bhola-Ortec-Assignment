@@ -15,6 +15,7 @@ export function FormSubmitButton({
       type="submit"
       disabled={!isValid || isSubmitting}
       className="w-full cursor-pointer"
+      data-cy="submit-button"
     >
       {isSubmitting ? (
         <>
@@ -30,4 +31,3 @@ export function FormSubmitButton({
     </Button>
   );
 }
-

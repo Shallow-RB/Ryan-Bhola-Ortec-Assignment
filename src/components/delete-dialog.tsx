@@ -29,6 +29,9 @@ export function DeleteDialog({
           size="icon-sm"
           aria-label={`Delete ${person.firstName}`}
           className="h-8 w-8 flex-shrink-0 cursor-pointer"
+          data-cy={`delete-button-${person.firstName
+            .toLowerCase()
+            .replace(/\s+/g, "-")}`}
         >
           <Trash2 className="h-4 w-4" />
         </Button>
@@ -59,6 +62,7 @@ export function DeleteDialog({
           <AlertDialogAction
             onClick={onConfirm}
             className="bg-red-600 hover:bg-red-700 text-white flex items-center gap-2"
+            data-cy="confirm-delete-button"
           >
             <Trash2 className="h-4 w-4" />
             Delete Person
